@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>たこ焼き屋台ゲーム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #d35400;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-panel {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .info-box .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .info-box .value {
+            font-size: 1.8em;
+            margin-top: 5px;
+        }
+
+        .customer-order {
+            background: #fffacd;
+            border: 3px solid #ffa500;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .customer-order h3 {
+            color: #d35400;
+            margin-bottom: 10px;
+        }
+
+        .customer-order .order-details {
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .takoyaki-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            background: #8b4513;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .takoyaki-hole {
+            aspect-ratio: 1;
+            background: radial-gradient(circle, #654321 0%, #3d2817 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            border: 3px solid #5a3a1a;
+        }
+
+        .takoyaki-hole:hover {
+            transform: scale(1.05);
+        }
+
+        .takoyaki {
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            transition: all 0.5s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+        }
+
+        .takoyaki.batter {
+            background: #f4e4c1;
+        }
+
+        .takoyaki.cooking {
+            background: linear-gradient(135deg, #f4e4c1 0%, #d4a574 100%);
+            animation: cook 2s infinite;
+        }
+
+        .takoyaki.flipped {
+            background: linear-gradient(135deg, #d4a574 0%, #8b6914 100%);
+        }
+
+        .takoyaki.done {
+            background: linear-gradient(135deg, #d4a574 0%, #8b6914 100%);
+            box-shadow: 0 0 10px rgba(212, 165, 116, 0.8);
+        }
+
+        @keyframes cook {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .boat-container {
+            background: #fff;
+            border: 3px solid #d35400;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 120px;
+        }
+
+        .boat-container h3 {
+            color: #d35400;
+            margin-bottom: 10px;
+        }
+
+        .boat {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            min-height: 60px;
+        }
+
+        .boat-takoyaki {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d4a574 0%, #8b6914 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.7em;
+            position: relative;
+        }
+
+        .boat-takoyaki.with-sauce::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(101, 67, 33, 0.6);
+            border-radius: 50%;
+        }
+
+        .boat-takoyaki.with-aonori::after {
+            content: '🌿';
+            position: absolute;
+            font-size: 1.5em;
+        }
+
+        .boat-takoyaki.with-mayo {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.8);
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .control-btn {
+            padding: 15px 20px;
+            font-size: 1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .control-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-pour { background: linear-gradient(135deg, #f4e4c1 0%, #d4a574 100%); color: #333; }
+        .btn-flip { background: linear-gradient(135deg, #ff9a56 0%, #ff6a00 100%); }
+        .btn-pickup { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .btn-sauce { background: linear-gradient(135deg, #654321 0%, #3d2817 100%); }
+        .btn-aonori { background: linear-gradient(135deg, #90ee90 0%, #228b22 100%); }
+        .btn-mayo { background: linear-gradient(135deg, #fff8dc 0%, #f0e68c 100%); color: #333; }
+        .btn-serve { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: #333; font-size: 1.2em; }
+
+        .message {
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🔥 たこ焼き屋台ゲーム 🔥</h1>
+
+        <div class="info-panel">
+            <div class="info-box">
+                <div class="label">売上</div>
+                <div class="value" id="revenue">¥0</div>
+            </div>
+            <div class="info-box">
+                <div class="label">提供数</div>
+                <div class="value" id="served">0</div>
+            </div>
+            <div class="info-box">
+                <div class="label">コンボ</div>
+                <div class="value" id="combo">0</div>
+            </div>
+        </div>
+
+        <div class="customer-order" id="customerOrder">
+            <h3>お客様の注文</h3>
+            <div class="order-details" id="orderDetails">
+                お客様を待っています...
+            </div>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="takoyaki-grid" id="grid"></div>
+
+        <div class="boat-container">
+            <h3>舟の容器（たこ焼き8個入り）</h3>
+            <div class="boat" id="boat"></div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn btn-pour" onclick="pourBatter()">①生地を流し込む</button>
+            <button class="control-btn btn-flip" onclick="flip()">②ひっくり返す</button>
+            <button class="control-btn btn-pickup" onclick="pickup()">③ピックアップ</button>
+            <button class="control-btn btn-sauce" onclick="addSauce()">④ソースをかける</button>
+            <button class="control-btn btn-aonori" onclick="addAonori()">⑤青のりをかける</button>
+            <button class="control-btn btn-mayo" onclick="addMayo()">⑥マヨネーズをかける</button>
+        </div>
+
+        <button class="control-btn btn-serve" onclick="serve()" style="width: 100%;">お客様に提供する</button>
+    </div>
+
+    <script>
+        // ゲーム状態
+        const GRID_SIZE = 12; // 2行6列
+        let takoyakiStates = Array(GRID_SIZE).fill(null).map(() => ({
+            state: 'empty', // empty, batter, cooking, flipped, done, picked
+            cookTime: 0,
+            flippedTime: 0
+        }));
+
+        let boat = [];
+        let boatStates = {
+            sauce: false,
+            aonori: false,
+            mayo: false
+        };
+
+        let revenue = 0;
+        let served = 0;
+        let combo = 0;
+
+        let currentOrder = null;
+
+        // 初期化
+        function init() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < GRID_SIZE; i++) {
+                const hole = document.createElement('div');
+                hole.className = 'takoyaki-hole';
+                hole.dataset.index = i;
+                hole.onclick = () => selectHole(i);
+
+                const takoyaki = document.createElement('div');
+                takoyaki.className = 'takoyaki';
+                takoyaki.id = `takoyaki-${i}`;
+
+                hole.appendChild(takoyaki);
+                grid.appendChild(hole);
+            }
+
+            generateNewOrder();
+            setInterval(updateCooking, 100);
+        }
+
+        // 選択された穴
+        let selectedHoles = new Set();
+
+        function selectHole(index) {
+            if (selectedHoles.has(index)) {
+                selectedHoles.delete(index);
+                document.querySelector(`[data-index="${index}"]`).style.border = '3px solid #5a3a1a';
+            } else {
+                selectedHoles.add(index);
+                document.querySelector(`[data-index="${index}"]`).style.border = '3px solid #ffa500';
+            }
+        }
+
+        // 生地を流し込む
+        function pourBatter() {
+            if (selectedHoles.size === 0) {
+                showMessage('穴を選択してください', 'error');
+                return;
+            }
+
+            let poured = 0;
+            selectedHoles.forEach(index => {
+                if (takoyakiStates[index].state === 'empty') {
+                    takoyakiStates[index].state = 'batter';
+                    takoyakiStates[index].cookTime = Date.now();
+                    poured++;
+                }
+            });
+
+            if (poured > 0) {
+                showMessage(`${poured}個の生地を流し込みました`, 'success');
+            }
+
+            selectedHoles.clear();
+            updateDisplay();
+        }
+
+        // ひっくり返す
+        function flip() {
+            if (selectedHoles.size === 0) {
+                showMessage('穴を選択してください', 'error');
+                return;
+            }
+
+            let flipped = 0;
+            let tooEarly = 0;
+
+            selectedHoles.forEach(index => {
+                const state = takoyakiStates[index];
+                if (state.state === 'cooking') {
+                    const cookDuration = (Date.now() - state.cookTime) / 1000;
+                    if (cookDuration >= 2) {
+                        state.state = 'flipped';
+                        state.flippedTime = Date.now();
+                        flipped++;
+                    } else {
+                        tooEarly++;
+                    }
+                }
+            });
+
+            if (flipped > 0) {
+                showMessage(`${flipped}個ひっくり返しました`, 'success');
+            }
+            if (tooEarly > 0) {
+                showMessage(`${tooEarly}個は早すぎます！もう少し待って`, 'error');
+            }
+
+            selectedHoles.clear();
+            updateDisplay();
+        }
+
+        // ピックアップ
+        function pickup() {
+            if (selectedHoles.size === 0) {
+                showMessage('穴を選択してください', 'error');
+                return;
+            }
+
+            let picked = 0;
+            selectedHoles.forEach(index => {
+                const state = takoyakiStates[index];
+                if (state.state === 'done' && boat.length < 8) {
+                    boat.push({ index: boat.length });
+                    state.state = 'empty';
+                    state.cookTime = 0;
+                    state.flippedTime = 0;
+                    picked++;
+                }
+            });
+
+            if (picked > 0) {
+                showMessage(`${picked}個を容器に入れました`, 'success');
+            }
+
+            selectedHoles.clear();
+            updateDisplay();
+        }
+
+        // ソースをかける
+        function addSauce() {
+            if (boat.length === 0) {
+                showMessage('容器にたこ焼きを入れてください', 'error');
+                return;
+            }
+
+            boatStates.sauce = true;
+            showMessage('ソースをかけました', 'success');
+            updateDisplay();
+        }
+
+        // 青のりをかける
+        function addAonori() {
+            if (boat.length === 0) {
+                showMessage('容器にたこ焼きを入れてください', 'error');
+                return;
+            }
+
+            boatStates.aonori = true;
+            showMessage('青のりをかけました', 'success');
+            updateDisplay();
+        }
+
+        // マヨネーズをかける
+        function addMayo() {
+            if (boat.length === 0) {
+                showMessage('容器にたこ焼きを入れてください', 'error');
+                return;
+            }
+
+            boatStates.mayo = true;
+            showMessage('マヨネーズをかけました', 'success');
+            updateDisplay();
+        }
+
+        // 提供する
+        function serve() {
+            if (boat.length !== 8) {
+                showMessage('8個のたこ焼きを容器に入れてください', 'error');
+                return;
+            }
+
+            if (!boatStates.sauce) {
+                showMessage('ソースをかけてください', 'error');
+                return;
+            }
+
+            // 注文チェック
+            let correct = true;
+            let errorMsg = '';
+
+            if (currentOrder.aonori && !boatStates.aonori) {
+                correct = false;
+                errorMsg = '青のりをかけ忘れています';
+            } else if (!currentOrder.aonori && boatStates.aonori) {
+                correct = false;
+                errorMsg = '青のりは不要でした（減点）';
+            }
+
+            if (currentOrder.mayo && !boatStates.mayo) {
+                correct = false;
+                errorMsg = 'マヨネーズをかけ忘れています';
+            } else if (!currentOrder.mayo && boatStates.mayo) {
+                correct = false;
+                errorMsg = 'マヨネーズは不要でした（減点）';
+            }
+
+            if (correct) {
+                combo++;
+                const basePrice = 500;
+                const bonusPrice = Math.min(combo * 50, 500);
+                const total = basePrice + bonusPrice;
+
+                revenue += total;
+                served++;
+
+                showMessage(`完璧です！+¥${total} (コンボ×${combo})`, 'success');
+            } else {
+                combo = 0;
+                revenue += 200; // 減点
+                served++;
+                showMessage(`${errorMsg}... +¥200`, 'error');
+            }
+
+            // リセット
+            boat = [];
+            boatStates = { sauce: false, aonori: false, mayo: false };
+            generateNewOrder();
+            updateDisplay();
+        }
+
+        // 新しい注文を生成
+        function generateNewOrder() {
+            currentOrder = {
+                aonori: Math.random() > 0.3,
+                mayo: Math.random() > 0.3
+            };
+
+            let orderText = 'たこ焼き8個（ソース';
+            if (currentOrder.aonori) orderText += '、青のり';
+            if (currentOrder.mayo) orderText += '、マヨネーズ';
+            orderText += '）';
+
+            if (!currentOrder.aonori) orderText += ' ※青のり不要';
+            if (!currentOrder.mayo) orderText += ' ※マヨネーズ不要';
+
+            document.getElementById('orderDetails').textContent = orderText;
+        }
+
+        // 調理状態の更新
+        function updateCooking() {
+            const now = Date.now();
+            let updated = false;
+
+            takoyakiStates.forEach((state, index) => {
+                if (state.state === 'batter') {
+                    const duration = (now - state.cookTime) / 1000;
+                    if (duration >= 1) {
+                        state.state = 'cooking';
+                        updated = true;
+                    }
+                } else if (state.state === 'flipped') {
+                    const duration = (now - state.flippedTime) / 1000;
+                    if (duration >= 2) {
+                        state.state = 'done';
+                        updated = true;
+                    }
+                }
+            });
+
+            if (updated) {
+                updateDisplay();
+            }
+        }
+
+        // 表示更新
+        function updateDisplay() {
+            // たこ焼きの状態
+            takoyakiStates.forEach((state, index) => {
+                const elem = document.getElementById(`takoyaki-${index}`);
+                elem.className = 'takoyaki';
+
+                if (state.state !== 'empty') {
+                    elem.classList.add(state.state);
+                }
+            });
+
+            // 舟の容器
+            const boatElem = document.getElementById('boat');
+            boatElem.innerHTML = '';
+
+            boat.forEach((item, index) => {
+                const takoyaki = document.createElement('div');
+                takoyaki.className = 'boat-takoyaki';
+                if (boatStates.sauce) takoyaki.classList.add('with-sauce');
+                if (boatStates.aonori) takoyaki.classList.add('with-aonori');
+                if (boatStates.mayo) takoyaki.classList.add('with-mayo');
+                boatElem.appendChild(takoyaki);
+            });
+
+            // 情報パネル
+            document.getElementById('revenue').textContent = `¥${revenue}`;
+            document.getElementById('served').textContent = served;
+            document.getElementById('combo').textContent = combo;
+
+            // 選択解除
+            document.querySelectorAll('.takoyaki-hole').forEach(hole => {
+                const index = parseInt(hole.dataset.index);
+                if (!selectedHoles.has(index)) {
+                    hole.style.border = '3px solid #5a3a1a';
+                }
+            });
+        }
+
+        // メッセージ表示
+        function showMessage(text, type) {
+            const msgElem = document.getElementById('message');
+            msgElem.textContent = text;
+            msgElem.className = `message ${type} fade-in`;
+
+            setTimeout(() => {
+                msgElem.textContent = '';
+                msgElem.className = 'message';
+            }, 3000);
+        }
+
+        // ゲーム開始
+        init();
+    </script>
+</body>
+</html>
